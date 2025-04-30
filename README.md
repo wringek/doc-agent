@@ -2,6 +2,8 @@
 
 An AI-powered documentation generator that creates technical documentation in Shopify Polaris style from source code.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Features
 
 - **Smart Documentation Generation**: Automatically generates comprehensive documentation from source code
@@ -14,7 +16,7 @@ An AI-powered documentation generator that creates technical documentation in Sh
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/wringek/doc-agent.git
 cd doc-agent
 ```
 
@@ -80,19 +82,29 @@ The system includes robust error handling:
 
 ## Contributing
 
+We welcome contributions! Please feel free to submit a Pull Request.
+
 1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-[Add your license information here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+The MIT License is a permissive free software license that allows users to:
+- Use the software for any purpose
+- Modify the software
+- Distribute the software
+- Use the software commercially
+
+The only requirement is that the original copyright notice and license terms must be included in any substantial portions of the software.
 
 ## Support
 
-For support, please [add your support contact information]
+For support, please open an issue in the [GitHub repository](https://github.com/wringek/doc-agent/issues).
 
 ## Style
 See [docs/short_descriptions.md](./docs/short_descriptions.md) for how to craft valid one-line summaries.
