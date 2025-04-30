@@ -3,11 +3,11 @@
 import sys
 from pathlib import Path
 
-from agent.ingestion import ingest
-from agent.outline import make_outline
-from agent.draft    import fill_sections
-from agent.lint     import self_lint
-from agent.publish  import write_doc
+from doc_agent.ingestion import ingest
+from doc_agent.outline import make_outline
+from doc_agent.draft    import fill_sections
+from doc_agent.lint     import self_lint
+from doc_agent.publish  import write_doc
 
 def main(path: str):
     """
