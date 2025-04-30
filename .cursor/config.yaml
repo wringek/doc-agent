@@ -1,0 +1,11 @@
+# .cursor/config.yaml
+
+# Project root (where you run `cursor .`)
+root: .
+
+# The script Cursor should execute
+entrypoint: src/main.py
+
+# Which Python to use
+env:
+  python: .venv/bin/python
