@@ -5,7 +5,7 @@ from pathlib import Path
 
 def write_doc(sections: dict, name: str):
     """
-    Merge section outputs into a Markdown file and save under docs/.
+    Merge section outputs into a Markdown file and save under output/.
     Includes the 'summary' field under the title, then only non-empty
     sections in a fixed order.
     """
@@ -30,8 +30,9 @@ def write_doc(sections: dict, name: str):
 
     # 4) Join and write out
     md = "\n".join(lines)
-    Path("docs").mkdir(exist_ok=True)
-    out = Path("docs") / f"{name}.md"
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    out = output_dir / f"{name}.md"
     out.write_text(md)
 
     print(f"Document written to {out}")

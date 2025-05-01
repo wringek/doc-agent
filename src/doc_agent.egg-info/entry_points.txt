@@ -1,0 +1,2 @@
+[console_scripts]
+doc-agent = doc_agent.__main__:main

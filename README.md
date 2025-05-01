@@ -1,198 +1,210 @@
-# Doc Agent
+# Doc-Agent: AI-Powered Documentation Assistant
 
-A Python-based tool that combines heuristics and AI-powered evaluations to improve text quality, with a focus on error messages and user-facing content.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Doc-Agent is an intelligent documentation generation and improvement system that combines Large Language Models (LLMs) with static analysis to create high-quality technical documentation.
 
 ## Features
 
-### Core Functionality
-- **AI-Powered Text Generation**: Generates context-aware text based on scenarios and style guidelines
-- **Static Heuristics**: Checks for forbidden words, passive voice, and other common issues
-- **AI-Based Linting**: Iteratively improves text quality through AI-powered suggestions
-- **Maximum Iteration Control**: Prevents infinite loops with configurable iteration limits
+- 🤖 AI-powered documentation generation with smart retry logic
+- 📝 Comprehensive evaluation system (heuristics, AI, rubrics)
+- 🔄 Iterative improvement with progress tracking
+- 📊 Multiple quality metrics (clarity, tone, empathy)
+- 🎯 Customizable documentation styles and formats
+- 🚀 Development optimization modes for rapid iteration
 
-### AI Evaluations
-- **Clarity & Actionability**: Rates text clarity (1-5) and checks if it's immediately actionable
-- **Tone & Brand Voice**: Evaluates alignment with specified brand voice (1-5)
-- **Empathy**: Assesses emotional intelligence and provides improvement suggestions
-- **Additional Evaluations**:
-  - Inclusivity & Bias Screening
-  - Readability for Non-Native Speakers
-  - Cognitive Load & Conciseness
-  - Accessibility Compliance
-  - Message Consistency
-  - User Trust & Confidence
-  - Internationalization Readiness
-
-## Installation
+## Quick Start
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/doc-agent.git
-   cd doc-agent
-   ```
+```bash
+git clone https://github.com/yourusername/doc-agent.git
+cd doc-agent
+```
 
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
+2. Set up your environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: `.venv\Scripts\activate`
+pip install -r requirements.txt
+```
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+3. Configure your environment:
+```bash
+cp .env.example .env
+# Edit .env with your OpenAI API key
+```
 
-4. Set up your OpenAI API key:
-   ```bash
-   echo "OPENAI_API_KEY=your-api-key-here" > .env
-   ```
+4. Run the documentation agent:
+```bash
+# Generate documentation
+python -m doc_agent generate --scenario "Write a function that sorts a list" --style "Clear and concise"
 
-## Usage
+# Process an existing document
+python -m doc_agent process path/to/source.py
+```
 
-### Quick Start
+## Command-Line Interface
 
-The simplest way to use Doc Agent is through the command line:
+Doc-Agent provides two main commands: `generate` and `process`.
+
+### Generate Command
+
+Generate and evaluate documentation from scratch:
 
 ```bash
-python src/doc_agent/agent_loop.py
+python -m doc_agent generate [options]
 ```
 
-This will:
-1. Generate an error message for a sample scenario
-2. Apply heuristic and lint fixes
-3. Run AI evaluations for clarity, tone, and empathy
-4. Display the results and final text
+#### Options
 
-Example output:
-```
---- AI Evaluations ---
-Clarity (5/5): The message clearly states what is required.
-Actionable? True. The user knows exactly what to do.
+- `--scenario TEXT` (Required): The scenario to generate text for
+- `--style TEXT`: The writing style to use (default: "Clear and professional")
+- `--max-iters N`: Maximum improvement iterations (default: 5)
+- `--eval LIST`: Comma-separated list of evaluators to run
+- `--forbidden-file PATH`: Custom forbidden words file
+- `--show-details`: Show detailed evaluation reports
+- `--json`: Output results in JSON format
+- `-v, --verbose`: Increase output verbosity
+- `-q, --quiet`: Suppress all output except errors and final result
 
-Tone (4/5, aligned=True):
-  The tone is friendly and empathetic.
+Development options:
+- `--no-eval`: Skip all evaluations (fastest, for development)
+- `--fast`: Use only fast evaluators (no AI calls)
 
-Empathy (4/5):
-  Shows understanding and provides clear guidance.
+### Process Command
 
---- Final Text ---
-"Enter your email to continue."
-```
-
-### Programmatic Usage
-
-```python
-from doc_agent.agent_loop import run_agent_loop
-from doc_agent.evaluators.ai_eval import (
-    evaluate_clarity_and_actionability,
-    evaluate_tone,
-    evaluate_empathy
-)
-
-# Generate and improve text
-text = run_agent_loop(
-    scenario="User submits a form without filling a required field",
-    style="Shopify inline error",
-    forbidden_file="src/doc_agent/evaluators/forbidden_words.txt",
-    max_iters=5
-)
-
-# Run evaluations
-clarity = evaluate_clarity_and_actionability(text)
-tone = evaluate_tone(text, brand_voice="friendly and empathetic")
-empathy = evaluate_empathy(text)
-
-# Access results
-print(f"Clarity: {clarity['clarity_score']}/5")
-print(f"Actionable? {clarity['actionable']}")
-print(f"Tone: {tone['tone_score']}/5")
-print(f"Empathetic? {empathy['empathetic']}")
-```
-
-## Testing
-
-The project includes comprehensive test coverage for all major components:
-
-### Running Tests
+Process an existing document through the improvement pipeline:
 
 ```bash
-# Run all tests
-pytest
-
-# Run tests with coverage report
-pytest --cov=doc_agent --cov-report=term-missing
-
-# Run specific test files
-pytest tests/test_agent_loop.py
-pytest tests/test_lint.py
+python -m doc_agent process [options] SOURCE_PATH
 ```
 
-### Test Structure
-- `test_agent_loop.py`: Tests for the main agent loop functionality
-- `test_lint.py`: Tests for linting and self-improvement features
-- `test_agent_loop_main.py`: Tests for AI evaluations and error handling
+#### Options
+
+- `SOURCE_PATH` (Required): Path to the source file to process
+- `--forbidden-file PATH`: Custom forbidden words file
+- `--json`: Output results in JSON format
+- `-v, --verbose`: Increase output verbosity
+- `-q, --quiet`: Suppress all output except errors and final result
+
+## Evaluators
+
+Doc-Agent includes several evaluators that can be combined to assess documentation quality. Use the `--eval` flag to specify which evaluators to run.
+
+### Fast Evaluators (No AI)
+
+1. **heuristics**
+   - Forbidden word detection
+   - Readability scoring
+   - Pattern matching
+   - Style compliance checks
+   - Fast, deterministic evaluation
+
+2. **rubric**
+   - Documentation structure validation
+   - Quality criteria checking
+   - Format verification
+   - Standard compliance
+   - Quick structural analysis
+
+### AI-Powered Evaluators
+
+1. **clarity**
+   - Assesses text clarity (1-5 scale)
+   - Checks actionability
+   - Provides clarity improvement suggestions
+   - Uses AI for semantic understanding
+
+2. **empathy**
+   - Evaluates emotional intelligence (1-5 scale)
+   - Checks user-friendliness
+   - Suggests empathy improvements
+   - Considers reader perspective
+
+3. **tone**
+   - Analyzes writing tone
+   - Checks brand voice alignment
+   - Scores tone appropriateness (1-5)
+   - Suggests tone improvements
+
+### Usage Examples
+
+1. Fast evaluation (no AI calls):
+```bash
+python -m doc_agent generate \
+  --scenario "Document the API endpoint" \
+  --eval "heuristics,rubric" \
+  --fast
+```
+
+2. Comprehensive evaluation:
+```bash
+python -m doc_agent generate \
+  --scenario "Write error message" \
+  --eval "heuristics,rubric,clarity,empathy,tone" \
+  --show-details
+```
+
+3. Focus on user experience:
+```bash
+python -m doc_agent generate \
+  --scenario "Write installation guide" \
+  --eval "clarity,empathy" \
+  --style "User-friendly"
+```
+
+4. Quick development iteration:
+```bash
+python -m doc_agent generate \
+  --scenario "Draft API docs" \
+  --no-eval
+```
 
 ## Project Structure
 
 ```
 doc-agent/
-├── src/
-│   └── doc_agent/
-│       ├── agent_loop.py      # Main agent loop implementation
-│       ├── evaluators/
-│       │   ├── ai_eval.py     # AI-powered evaluations
-│       │   └── heuristics.py  # Static heuristic checks
-│       ├── draft.py           # Text generation tools
-│       └── lint.py            # Linting functionality
-├── tests/
-│   ├── test_agent_loop.py
-│   ├── test_lint.py
-│   └── test_agent_loop_main.py
-└── requirements.txt
+├── src/doc_agent/          # Core package
+│   ├── __main__.py        # Entry point & CLI
+│   ├── agent.py           # Agent implementation
+│   ├── pipeline.py        # Pipeline orchestration
+│   ├── agent_loop.py      # Processing loop
+│   ├── draft.py           # Content generation
+│   ├── tools.py           # Utility functions
+│   ├── lint.py           # Linting functionality
+│   ├── outline.py        # Document structure
+│   ├── publish.py        # Output generation
+│   ├── ingestion.py      # Input processing
+│   ├── evaluators/       # Quality assessment
+│   └── linters/         # Style checking
+├── docs/                 # Documentation
+│   ├── architecture.md   # System design
+│   └── adr/             # Architecture decisions
+├── tests/               # Test suite
+└── examples/            # Usage examples
 ```
 
-## Development
+## Architecture
 
-### Adding New Evaluators
+The system follows a pipeline architecture with these key components:
 
-1. Add your evaluator function in `src/doc_agent/evaluators/ai_eval.py`
-2. Use the `@handle_openai_call` decorator for error handling
-3. Return a dictionary with appropriate evaluation metrics
-4. Add tests in `tests/test_agent_loop_main.py`
+1. **Input Processing** (`ingestion.py`): Parse requirements and style preferences
+2. **Content Generation** (`draft.py`): Generate initial documentation using LLMs
+3. **Quality Assessment** (`evaluators/`): Evaluate content using multiple metrics
+4. **Pipeline Processing** (`pipeline.py`): Coordinate the documentation flow
+5. **Agent Management** (`agent.py`): Handle AI interactions and improvements
+6. **Publication** (`publish.py`): Format and output final documentation
 
-### Error Handling
-
-The project includes robust error handling for:
-- OpenAI API errors
-- JSON parsing errors
-- Maximum iteration limits
-- Invalid inputs
+For detailed architecture information, see [docs/architecture.md](docs/architecture.md).
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The MIT License is a permissive free software license that allows users to:
-- Use the software for any purpose
-- Modify the software
-- Distribute the software
-- Use the software commercially
+## Acknowledgments
 
-The only requirement is that the original copyright notice and license terms must be included in any substantial portions of the software.
-
-## Support
-
-For issues and feature requests, please use the GitHub issue tracker.
-
-## Style
-See [docs/short_descriptions.md](./docs/short_descriptions.md) for how to craft valid one-line summaries.
+- OpenAI for their powerful language models
+- The Python community for excellent documentation tools
+- All contributors to this project
