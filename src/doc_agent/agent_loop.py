@@ -1,58 +1,87 @@
+#agent_loop.py
+
 #!/usr/bin/env python
 """
-Agent loop that combines heuristics and AI-based linting to improve text.
+Agent loop that combines LLM drafting, static heuristics, AI‐lint fixes, 
+and a final AI‐driven evaluation.
 """
 
 import os
-from typing import Dict, Any
-
+from typing import Dict
 from doc_agent.evaluators.heuristics import run_heuristics
 from doc_agent.draft import draft_copy_tool
-from doc_agent.tools import lint_copy
-from doc_agent.tools import build_fix  # or wherever you keep it
+from doc_agent.tools import lint_copy, build_fix
 
-def main(max_iters: int = 10):
-    scenario = "User submits a form without filling a required field"
-    style    = "Shopify inline error"
+# Import the new evaluator
+from doc_agent.evaluators.ai_eval import evaluate_text
 
-    here           = os.path.dirname(__file__)
-    forbidden_file = os.path.join(here, "evaluators", "forbidden_words.txt")
 
-    # 0️⃣ Seed initial draft
+def run_agent_loop(
+    scenario: str,
+    style: str,
+    forbidden_file: str,
+    max_iters: int = 10,
+) -> str:
+    """
+    Returns the final, lint‐approved text after at most max_iters.
+    """
     text = draft_copy_tool(scenario=scenario, style=style)
 
-
-    for i in range(1, 11):
-        print(f"\n— Iteration {i} —")
-
-        # 1️⃣ Run static heuristics first
-        metrics = run_heuristics(text, forbidden_file=forbidden_file)
-        print("Heuristic metrics:", metrics)
-        if metrics.get("forbidden"):
-            # Build and apply a heuristic fix
-            fix_prompt = build_fix([{"msg": f"Remove forbidden words: {', '.join(metrics['forbidden'])}"}])
-            print("🔧 Applying heuristic fix:", fix_prompt)
-            text = draft_copy_tool(scenario=scenario, style=style, previous=text, fix=fix_prompt)
+    for i in range(1, max_iters + 1):
+        # 1️⃣ Static heuristics
+        heur = run_heuristics(text, forbidden_file=forbidden_file)
+        if heur["errors"]:
+            fix_prompt = build_fix(heur["errors"])
+            print(f"🔧 Iter {i}: applying heuristic fixes → {fix_prompt}")
+            text = draft_copy_tool(
+                scenario=scenario,
+                style=style,
+                previous=text,
+                fix=fix_prompt
+            )
             continue
-        else:
-            print("✅ Heuristics clean")
 
-        # 2️⃣ Now run the AI linter
+        # 2️⃣ AI‐based lint
         lint_result = lint_copy(text)
-        if lint_result.get("status") == "PASS":
-            print("🚀 Lint passed — done!")
+        if lint_result["status"] == "PASS":
+            print(f"✅ Iter {i}: lint passed")
             break
 
-        # 3️⃣ Build and apply an AI‐driven fix
-        print("⚠️ Lint errors:", lint_result["errors"])
+        # 3️⃣ AI‐driven fix
         fix_prompt = build_fix(lint_result["errors"])
-        print("🔧 Applying AI fix:", fix_prompt)
-        text = draft_copy_tool(scenario=scenario, style=style, previous=text, fix=fix_prompt)
+        print(f"🔧 Iter {i}: applying AI‐lint fixes → {fix_prompt}")
+        text = draft_copy_tool(
+            scenario=scenario,
+            style=style,
+            previous=text,
+            fix=fix_prompt
+        )
     else:
-        print("❌ Exceeded max iterations without passing lint.")
+        raise RuntimeError(f"No PASS after {max_iters} iterations")
 
-    print("\n--- Final Text ---\n")
-    print(text)
+    return text
+
+
+def main():
+    here = os.path.dirname(__file__)
+    forbidden_file = os.path.join(here, "evaluators", "forbidden_words.txt")
+
+    # 0️⃣ Run the loop
+    final = run_agent_loop(
+        scenario="User submits a form without filling a required field",
+        style="Shopify inline error",
+        forbidden_file=forbidden_file,
+        max_iters=5,
+    )
+
+    # 4️⃣ AI‐evaluation on the final draft
+    eval_report = evaluate_text(final)
+    print("\n--- AI Evaluation ---")
+    print(f"Clarity ({eval_report['clarity_score']}/5): {eval_report['clarity_explanation']}")
+    print(f"Actionable: {eval_report['actionable']}. {eval_report['actionability_comment']}")
+
+    # 5️⃣ Print the final copy
+    print("\n--- Final Text ---\n", final)
 
 
 if __name__ == "__main__":
