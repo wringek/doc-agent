@@ -1,98 +1,161 @@
 # Doc Agent
 
-An AI-powered documentation generator that creates technical documentation in Shopify Polaris style from source code.
+A Python-based tool that combines heuristics and AI-powered evaluations to improve text quality, with a focus on error messages and user-facing content.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
-- **Smart Documentation Generation**: Automatically generates comprehensive documentation from source code
-- **Shopify Polaris Style**: Follows Shopify's design system documentation guidelines
-- **Self-Linting**: Includes built-in linting to ensure documentation quality
-- **Error Recovery**: Graceful fallback mechanisms when AI processing fails
-- **Environment-Based Configuration**: Secure API key management using environment variables
+### Core Functionality
+- **AI-Powered Text Generation**: Generates context-aware text based on scenarios and style guidelines
+- **Static Heuristics**: Checks for forbidden words, passive voice, and other common issues
+- **AI-Based Linting**: Iteratively improves text quality through AI-powered suggestions
+- **Maximum Iteration Control**: Prevents infinite loops with configurable iteration limits
+
+### AI Evaluations
+- **Clarity & Actionability**: Rates text clarity (1-5) and checks if it's immediately actionable
+- **Tone & Brand Voice**: Evaluates alignment with specified brand voice
+- **Empathy**: Assesses emotional intelligence and suggests improvements
+- **Additional Evaluations**:
+  - Inclusivity & Bias Screening
+  - Readability for Non-Native Speakers
+  - Cognitive Load & Conciseness
+  - Accessibility Compliance
+  - Message Consistency
+  - User Trust & Confidence
+  - Internationalization Readiness
 
 ## Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/wringek/doc-agent.git
-cd doc-agent
-```
+   ```bash
+   git clone https://github.com/yourusername/doc-agent.git
+   cd doc-agent
+   ```
 
 2. Create and activate a virtual environment:
-```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
 
 3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Set up your environment variables:
-   - Create a `.env` file in the project root
-   - Add your OpenAI API key:
+   ```bash
+   pip install -r requirements.txt
    ```
-   OPENAI_API_KEY=your_api_key_here
+
+4. Set up your OpenAI API key:
+   ```bash
+   echo "OPENAI_API_KEY=your-api-key-here" > .env
    ```
 
 ## Usage
 
-Run the documentation generator on a source file:
+### Running the Agent Loop
 
-```bash
-python src/main.py path/to/your/source/file
+```python
+from doc_agent.agent_loop import run_agent_loop
+
+text = run_agent_loop(
+    scenario="User submits a form without filling a required field",
+    style="Shopify inline error",
+    forbidden_file="path/to/forbidden_words.txt",
+    max_iters=5
+)
 ```
 
-The generated documentation will be saved in the `docs/` directory.
+### Running AI Evaluations
+
+```python
+from doc_agent.evaluators.ai_eval import (
+    evaluate_clarity_and_actionability,
+    evaluate_tone,
+    evaluate_empathy
+)
+
+# Evaluate clarity and actionability
+clarity = evaluate_clarity_and_actionability(text)
+print(f"Clarity: {clarity['clarity_score']}/5")
+
+# Evaluate tone
+tone = evaluate_tone(text, brand_voice="friendly and empathetic")
+print(f"Tone: {tone['tone_score']}/5")
+
+# Evaluate empathy
+empathy = evaluate_empathy(text)
+print(f"Empathy: {empathy['empathy_score']}/5")
+```
+
+## Testing
+
+The project includes comprehensive test coverage for all major components:
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run tests with coverage report
+pytest --cov=doc_agent --cov-report=term-missing
+
+# Run specific test files
+pytest tests/test_agent_loop.py
+pytest tests/test_lint.py
+```
+
+### Test Structure
+- `test_agent_loop.py`: Tests for the main agent loop functionality
+- `test_lint.py`: Tests for linting and self-improvement features
+- `test_agent_loop_main.py`: Tests for AI evaluations and error handling
 
 ## Project Structure
 
 ```
 doc-agent/
 ├── src/
-│   ├── agent/
-│   │   ├── ingestion.py  # Source code parsing and metadata extraction
-│   │   ├── outline.py    # Documentation structure generation
-│   │   ├── draft.py      # Content generation using OpenAI
-│   │   ├── lint.py       # Documentation quality checks
-│   │   └── publish.py    # Documentation file generation
-│   └── main.py          # Main entry point
-├── docs/                # Generated documentation
-├── examples/            # Example source files
-└── tests/              # Test suite
+│   └── doc_agent/
+│       ├── agent_loop.py      # Main agent loop implementation
+│       ├── evaluators/
+│       │   ├── ai_eval.py     # AI-powered evaluations
+│       │   └── heuristics.py  # Static heuristic checks
+│       ├── draft.py           # Text generation tools
+│       └── lint.py            # Linting functionality
+├── tests/
+│   ├── test_agent_loop.py
+│   ├── test_lint.py
+│   └── test_agent_loop_main.py
+└── requirements.txt
 ```
 
-## Dependencies
+## Development
 
-- Python 3.11+
-- OpenAI API client
-- python-dotenv
-- httpx
-- pytest (for testing)
+### Adding New Evaluators
 
-## Error Handling
+1. Add your evaluator function in `src/doc_agent/evaluators/ai_eval.py`
+2. Use the `@handle_openai_call` decorator for error handling
+3. Return a dictionary with appropriate evaluation metrics
+4. Add tests in `tests/test_agent_loop_main.py`
 
-The system includes robust error handling:
-- Automatic retries with exponential backoff for API calls
-- Fallback to basic documentation when AI processing fails
-- Timeout management for API calls
+### Error Handling
+
+The project includes robust error handling for:
+- OpenAI API errors
+- JSON parsing errors
+- Maximum iteration limits
+- Invalid inputs
 
 ## Contributing
 
-We welcome contributions! Please feel free to submit a Pull Request.
-
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 The MIT License is a permissive free software license that allows users to:
 - Use the software for any purpose
@@ -104,7 +167,7 @@ The only requirement is that the original copyright notice and license terms mus
 
 ## Support
 
-For support, please open an issue in the [GitHub repository](https://github.com/wringek/doc-agent/issues).
+For issues and feature requests, please use the GitHub issue tracker.
 
 ## Style
 See [docs/short_descriptions.md](./docs/short_descriptions.md) for how to craft valid one-line summaries.

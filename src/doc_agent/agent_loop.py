@@ -1,9 +1,7 @@
-#agent_loop.py
-
 #!/usr/bin/env python
 """
-Agent loop that combines LLM drafting, static heuristics, AI‐lint fixes, 
-and a final AI‐driven evaluation.
+Agent loop that combines LLM drafting, static heuristics, AI‐lint fixes,
+and a suite of AI‐driven evaluations (clarity, tone, empathy).
 """
 
 import os
@@ -12,8 +10,13 @@ from doc_agent.evaluators.heuristics import run_heuristics
 from doc_agent.draft import draft_copy_tool
 from doc_agent.tools import lint_copy, build_fix
 
-# Import the new evaluator
-from doc_agent.evaluators.ai_eval import evaluate_text
+# Import your new evaluators individually
+from doc_agent.evaluators.ai_eval import (
+    evaluate_clarity_and_actionability,
+    evaluate_tone,
+    evaluate_empathy,
+    # ...you can import more here as you add them
+)
 
 
 def run_agent_loop(
@@ -22,39 +25,33 @@ def run_agent_loop(
     forbidden_file: str,
     max_iters: int = 10,
 ) -> str:
-    """
-    Returns the final, lint‐approved text after at most max_iters.
-    """
     text = draft_copy_tool(scenario=scenario, style=style)
 
     for i in range(1, max_iters + 1):
-        # 1️⃣ Static heuristics
         heur = run_heuristics(text, forbidden_file=forbidden_file)
         if heur["errors"]:
             fix_prompt = build_fix(heur["errors"])
-            print(f"🔧 Iter {i}: applying heuristic fixes → {fix_prompt}")
+            print(f"🔧 Iter {i}: heuristic fixes → {fix_prompt}")
             text = draft_copy_tool(
                 scenario=scenario,
                 style=style,
                 previous=text,
-                fix=fix_prompt
+                fix=fix_prompt,
             )
             continue
 
-        # 2️⃣ AI‐based lint
         lint_result = lint_copy(text)
         if lint_result["status"] == "PASS":
             print(f"✅ Iter {i}: lint passed")
             break
 
-        # 3️⃣ AI‐driven fix
         fix_prompt = build_fix(lint_result["errors"])
-        print(f"🔧 Iter {i}: applying AI‐lint fixes → {fix_prompt}")
+        print(f"🔧 Iter {i}: lint fixes → {fix_prompt}")
         text = draft_copy_tool(
             scenario=scenario,
             style=style,
             previous=text,
-            fix=fix_prompt
+            fix=fix_prompt,
         )
     else:
         raise RuntimeError(f"No PASS after {max_iters} iterations")
@@ -66,7 +63,7 @@ def main():
     here = os.path.dirname(__file__)
     forbidden_file = os.path.join(here, "evaluators", "forbidden_words.txt")
 
-    # 0️⃣ Run the loop
+    # 1️⃣ Run your drafting/heuristics/lint loop
     final = run_agent_loop(
         scenario="User submits a form without filling a required field",
         style="Shopify inline error",
@@ -74,14 +71,25 @@ def main():
         max_iters=5,
     )
 
-    # 4️⃣ AI‐evaluation on the final draft
-    eval_report = evaluate_text(final)
-    print("\n--- AI Evaluation ---")
-    print(f"Clarity ({eval_report['clarity_score']}/5): {eval_report['clarity_explanation']}")
-    print(f"Actionable: {eval_report['actionable']}. {eval_report['actionability_comment']}")
+    # 2️⃣ Now run your AI‐driven evaluations
+    clarity = evaluate_clarity_and_actionability(final)
+    tone    = evaluate_tone(final, brand_voice="friendly and empathetic")
+    empathy = evaluate_empathy(final)
 
-    # 5️⃣ Print the final copy
-    print("\n--- Final Text ---\n", final)
+    # 3️⃣ Print out each report
+    print("\n--- AI Evaluations ---")
+    print(f"Clarity ({clarity['clarity_score']}/5): {clarity['clarity_explanation']}")
+    print(f"Actionable? {clarity['actionable']}. {clarity['actionability_comment']}\n")
+
+    print(f"Tone ({tone['tone_score']}/5, aligned={tone['tone_alignment']}):")
+    print(f"  {tone['tone_explanation']}\n")
+
+    print(f"Empathy ({empathy['empathy_score']}/5):")
+    print(f"  {empathy['empathy_explanation']}")
+    print(f"  Suggestions: {empathy['empathy_suggestions']}\n")
+
+    print("--- Final Text ---")
+    print(final)
 
 
 if __name__ == "__main__":
