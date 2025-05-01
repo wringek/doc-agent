@@ -1,0 +1,8 @@
+#forbidden_words.txt
+# Lines starting with ‘#’ are ignored
+# List any word or short phrase you want to forbid
+
+please
+streamline
+streamlining
+seamless

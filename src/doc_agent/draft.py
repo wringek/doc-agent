@@ -6,8 +6,12 @@ import openai
 import json
 from typing import Dict
 from httpx import HTTPError
+from dotenv import load_dotenv
 
-# Fallback if openai.error.Timeout isn’t available
+# Load environment variables from .env file
+load_dotenv()
+
+# Fallback if openai.error.Timeout isn't available
 try:
     from openai.error import Timeout as OpenAITimeout
 except ImportError:
@@ -50,8 +54,8 @@ def fill_sections(sections: Dict[str, str], source: str) -> Dict[str, str]:
                 "You are a technical writer using Shopify Polaris style.\n"
                 "Generate *only* the return value type and what it represents,\n"
                 "in the exact format `<type> – <description>`.\n"
-                "Do NOT start with the word “Returns” or form a full sentence.\n\n"
-                "(type and meaning). **Do not** write any retail return policies or shipping/returns instructions—just the function’s return value."
+                "Do NOT start with the word 'Returns' or form a full sentence.\n\n"
+                "(type and meaning). **Do not** write any retail return policies or shipping/returns instructions—just the function's return value."
                 f"{source}\n\n"
                 "Return value (type and description):"
             )
@@ -96,3 +100,48 @@ def fill_sections(sections: Dict[str, str], source: str) -> Dict[str, str]:
                 time.sleep(2 ** attempts)
 
     return filled
+
+def draft_copy_tool(scenario: str, style: str, previous: str = None, fix: str = None) -> str:
+    """
+    Generate or improve text based on a scenario and style.
+    
+    Args:
+        scenario: Description of the situation to write about
+        style: Writing style to use (e.g., "Shopify inline error")
+        previous: Optional previous version of the text to improve
+        fix: Optional fix instructions to apply
+        
+    Returns:
+        Generated or improved text
+    """
+    if previous and fix:
+        prompt = (
+            f"You are a technical writer using {style} style.\n"
+            f"Improve the following text by applying these fixes: {fix}\n\n"
+            f"Previous text:\n{previous}\n\n"
+            "Improved text:"
+        )
+    else:
+        prompt = (
+            f"You are a technical writer using {style} style.\n"
+            f"Write text for this scenario: {scenario}\n\n"
+            "Text:"
+        )
+    
+    # Retry logic for API calls
+    attempts = 0
+    while True:
+        try:
+            resp = openai.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "system", "content": prompt}],
+                temperature=0.7,
+                timeout=15
+            )
+            return resp.choices[0].message.content.strip()
+            
+        except (HTTPError, OpenAITimeout) as e:
+            attempts += 1
+            if attempts >= 3:
+                raise RuntimeError(f"Failed to generate text after {attempts} attempts: {e}")
+            time.sleep(2 ** attempts)

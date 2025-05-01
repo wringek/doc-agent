@@ -1,6 +1,6 @@
 # src/agent/lint.py
 
-from tools import draft_copy, lint_copy
+from doc_agent.tools import draft_copy, lint_copy
 
 MAX_LINT_ITERATIONS = 5  # prevent infinite loops
 

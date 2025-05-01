@@ -1,7 +1,7 @@
 # tests/test_outline.py
 
 import pytest
-from agent.outline import make_outline
+from doc_agent.outline import make_outline
 
 def test_make_outline_keys():
     data = {"name": "add"}
