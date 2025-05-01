@@ -65,8 +65,8 @@ def main():
 
     # 1️⃣ Run your drafting/heuristics/lint loop
     final = run_agent_loop(
-        scenario="User submits a form without filling a required field",
-        style="Shopify inline error",
+        scenario="User submits a form without filling the 'Email' field which is required",
+        style="Shopify inline error - be direct, avoid 'please', use active voice",
         forbidden_file=forbidden_file,
         max_iters=5,
     )
@@ -84,9 +84,8 @@ def main():
     print(f"Tone ({tone['tone_score']}/5, aligned={tone['tone_alignment']}):")
     print(f"  {tone['tone_explanation']}\n")
 
-    print(f"Empathy ({empathy['empathy_score']}/5):")
-    print(f"  {empathy['empathy_explanation']}")
-    print(f"  Suggestions: {empathy['empathy_suggestions']}\n")
+    print(f"Empathy ({4 if empathy['empathetic'] else 2}/5):")
+    print(f"  {empathy['suggestion']}\n")
 
     print("--- Final Text ---")
     print(final)

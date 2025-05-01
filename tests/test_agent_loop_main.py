@@ -17,9 +17,8 @@ def mock_openai_client():
         "tone_score": 4,
         "tone_alignment": true,
         "tone_explanation": "The tone is friendly and empathetic.",
-        "empathy_score": 4,
-        "empathy_explanation": "The message shows understanding.",
-        "empathy_suggestions": "Add more personal touch."
+        "empathetic": true,
+        "suggestion": "The message shows good empathy."
     }'''
     client.chat.completions.create.return_value = mock_completion
     return client
@@ -58,9 +57,8 @@ def test_main_with_low_clarity(mock_dependencies, capsys):
         "tone_score": 3,
         "tone_alignment": false,
         "tone_explanation": "The tone could be more friendly.",
-        "empathy_score": 2,
-        "empathy_explanation": "The message lacks empathy.",
-        "empathy_suggestions": "Show more understanding."
+        "empathetic": false,
+        "suggestion": "Add more understanding and support."
     }'''
     mock_client.chat.completions.create.return_value = mock_completion
 

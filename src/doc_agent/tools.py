@@ -19,16 +19,48 @@ from doc_agent.evaluators.heuristics import WEASEL_WORDS
 for w in WEASEL_WORDS:
     ERROR_FIX_TEMPLATES[f"weasel word: {w}"] = f"Remove the word '{w}' to strengthen clarity."
 
-def lint_copy(text: str) -> dict:
+def draft_copy(text: str, fix: str) -> str:
     """
-    Run your short-description linter and return its JSON result.
-    Expects {'status': 'PASS'|'FAIL', 'errors': [...]}
+    Generate an improved version of the text based on fix instructions.
+    This should call the OpenAI Edits or Chat API in practice.
+    
+    Args:
+        text: The original text to improve
+        fix: Instructions for how to improve the text
+        
+    Returns:
+        str: The improved text
     """
+    # TODO: Integrate with OpenAI API
+    return text
+
+def lint_copy(text: str, section: str = "") -> dict:
+    """
+    Lint function output. If section == 'summary', use static short_description.lint;
+    otherwise, apply general Polaris-style rules.
+
+    Args:
+        text: The text to lint
+        section: Optional section name (e.g., "summary" for special handling)
+        
+    Returns:
+        dict: { status: 'PASS'|'FAIL', errors: [...] }
+    """
+    if section == "summary":
+        from doc_agent.linters.short_description import lint as short_lint
+        return short_lint(text)
+    # General lint stub: always pass
     return {"status": "PASS", "errors": []}
 
 def build_fix(errors: list[dict]) -> str:
     """
     Generate human-readable fix instructions from lint and heuristic errors.
+
+    Args:
+        errors: List of error dictionaries or strings
+        
+    Returns:
+        str: Human-readable instructions for fixing the issues
 
     - Uses ERROR_FIX_TEMPLATES for known lint messages.
     - Passes through heuristic messages (which you craft dynamically).

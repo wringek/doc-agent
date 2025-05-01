@@ -36,6 +36,8 @@ def handle_openai_call(func):
                 "tone_alignment": False,
                 "tone_explanation": "Error during evaluation",
                 # Empathy fields
+                "empathetic": False,
+                "suggestion": "Error during evaluation",
                 "empathy_score": 0,
                 "empathy_explanation": "Error during evaluation",
                 "empathy_suggestions": "Error during evaluation"
@@ -95,7 +97,7 @@ def evaluate_tone(
       {
         "tone_score": 1–5 int,
         "tone_alignment": true|false,
-        "explanation": "…"
+        "tone_explanation": "…"
       }
     """
     return f"""
@@ -113,7 +115,7 @@ Respond ONLY with JSON, for example:
 {{
   "tone_score": 4,
   "tone_alignment": true,
-  "explanation": "Language is polite but could be more empathetic."
+  "tone_explanation": "Language is polite but could be more empathetic."
 }}
 """
 

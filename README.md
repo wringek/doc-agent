@@ -14,8 +14,8 @@ A Python-based tool that combines heuristics and AI-powered evaluations to impro
 
 ### AI Evaluations
 - **Clarity & Actionability**: Rates text clarity (1-5) and checks if it's immediately actionable
-- **Tone & Brand Voice**: Evaluates alignment with specified brand voice
-- **Empathy**: Assesses emotional intelligence and suggests improvements
+- **Tone & Brand Voice**: Evaluates alignment with specified brand voice (1-5)
+- **Empathy**: Assesses emotional intelligence and provides improvement suggestions
 - **Additional Evaluations**:
   - Inclusivity & Bias Screening
   - Readability for Non-Native Speakers
@@ -51,39 +51,64 @@ A Python-based tool that combines heuristics and AI-powered evaluations to impro
 
 ## Usage
 
-### Running the Agent Loop
+### Quick Start
+
+The simplest way to use Doc Agent is through the command line:
+
+```bash
+python src/doc_agent/agent_loop.py
+```
+
+This will:
+1. Generate an error message for a sample scenario
+2. Apply heuristic and lint fixes
+3. Run AI evaluations for clarity, tone, and empathy
+4. Display the results and final text
+
+Example output:
+```
+--- AI Evaluations ---
+Clarity (5/5): The message clearly states what is required.
+Actionable? True. The user knows exactly what to do.
+
+Tone (4/5, aligned=True):
+  The tone is friendly and empathetic.
+
+Empathy (4/5):
+  Shows understanding and provides clear guidance.
+
+--- Final Text ---
+"Enter your email to continue."
+```
+
+### Programmatic Usage
 
 ```python
 from doc_agent.agent_loop import run_agent_loop
-
-text = run_agent_loop(
-    scenario="User submits a form without filling a required field",
-    style="Shopify inline error",
-    forbidden_file="path/to/forbidden_words.txt",
-    max_iters=5
-)
-```
-
-### Running AI Evaluations
-
-```python
 from doc_agent.evaluators.ai_eval import (
     evaluate_clarity_and_actionability,
     evaluate_tone,
     evaluate_empathy
 )
 
-# Evaluate clarity and actionability
+# Generate and improve text
+text = run_agent_loop(
+    scenario="User submits a form without filling a required field",
+    style="Shopify inline error",
+    forbidden_file="src/doc_agent/evaluators/forbidden_words.txt",
+    max_iters=5
+)
+
+# Run evaluations
 clarity = evaluate_clarity_and_actionability(text)
-print(f"Clarity: {clarity['clarity_score']}/5")
-
-# Evaluate tone
 tone = evaluate_tone(text, brand_voice="friendly and empathetic")
-print(f"Tone: {tone['tone_score']}/5")
-
-# Evaluate empathy
 empathy = evaluate_empathy(text)
-print(f"Empathy: {empathy['empathy_score']}/5")
+
+# Access results
+print(f"Clarity: {clarity['clarity_score']}/5")
+print(f"Actionable? {clarity['actionable']}")
+print(f"Tone: {tone['tone_score']}/5")
+print(f"Empathetic? {empathy['empathetic']}")
 ```
 
 ## Testing
