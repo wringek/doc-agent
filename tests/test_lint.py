@@ -1,6 +1,6 @@
 # tests/test_lint.py
 import pytest
-from tools import lint_copy
+from doc_agent.tools import lint_copy
 
 def test_lint_copy_passes_by_default():
     result = lint_copy("Any text")

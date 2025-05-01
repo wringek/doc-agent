@@ -1,7 +1,8 @@
 # tests/test_ingestion.py
 
 import pytest
-from agent.ingestion import ingest
+
+from doc_agent.ingestion import ingest
 
 def test_ingest_strips_comments_and_parses_metadata(tmp_path):
     sample = """
