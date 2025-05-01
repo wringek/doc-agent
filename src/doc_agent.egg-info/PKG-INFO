@@ -1,5 +1,349 @@
 Metadata-Version: 2.4
 Name: doc_agent
-Version: 0.1
+Version: 0.1.0
+Summary: An AI-powered document generation and evaluation tool
+Author-email: Your Name <your.email@example.com>
+License: MIT License
+        
+        Copyright (c) 2024 Doc Agent Contributors
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE. 
+Project-URL: Homepage, https://github.com/yourusername/doc-agent
+Project-URL: Bug Reports, https://github.com/yourusername/doc-agent/issues
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: openai>=1.0.0
+Requires-Dist: python-dotenv
+Requires-Dist: httpx
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: isort; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
 Dynamic: license-file
+
+# Doc-Agent: AI-Powered Documentation Assistant
+
+Doc-Agent is an intelligent documentation generation and improvement system that combines Large Language Models (LLMs) with static analysis to create high-quality technical documentation.
+
+## Features
+
+- 🤖 AI-powered documentation generation
+- 📝 Automatic style and consistency checking
+- 🔄 Iterative improvement through feedback loops
+- 📊 Multiple quality evaluation metrics
+- 🎯 Customizable documentation styles and formats
+
+## Quick Start
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/doc-agent.git
+cd doc-agent
+```
+
+2. Set up your environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: `.venv\Scripts\activate`
+pip install -r requirements.txt
+```
+
+3. Configure your environment:
+```bash
+cp .env.example .env
+# Edit .env with your OpenAI API key
+```
+
+4. Run the documentation agent:
+```bash
+# Generate documentation
+python -m doc_agent generate --scenario "Write a function that sorts a list" --style "Clear and concise"
+
+# Process an existing document
+python -m doc_agent process path/to/source.py
+```
+
+## Command-Line Interface
+
+Doc-Agent provides two main commands: `generate` and `process`.
+
+### Generate Command
+
+Generate and evaluate documentation from scratch:
+
+```bash
+python -m doc_agent generate [options]
+```
+
+#### Options
+
+- `--scenario TEXT` (Required): The scenario to generate text for
+- `--style TEXT`: The writing style to use (default: "Clear and professional")
+- `--max-iters N`: Maximum improvement iterations (default: 5)
+- `--eval LIST`: Comma-separated list of evaluators to run
+- `--forbidden-file PATH`: Custom forbidden words file
+- `--show-details`: Show detailed evaluation reports
+- `--json`: Output results in JSON format
+- `-v, --verbose`: Increase output verbosity
+- `-q, --quiet`: Suppress all output except errors and final result
+
+Development options:
+- `--no-eval`: Skip all evaluations (fastest, for development)
+- `--fast`: Use only fast evaluators (no AI calls)
+
+### Process Command
+
+Process an existing document through the improvement pipeline:
+
+```bash
+python -m doc_agent process [options] SOURCE_PATH
+```
+
+#### Options
+
+- `SOURCE_PATH` (Required): Path to the source file to process
+- `--json`: Output results in JSON format
+- `-v, --verbose`: Increase output verbosity
+- `-q, --quiet`: Suppress all output except errors and final result
+
+## Evaluators
+
+Doc-Agent includes several evaluators that can be combined to assess documentation quality. Use the `--eval` flag to specify which evaluators to run.
+
+### Fast Evaluators (No AI)
+
+1. **heuristics**
+   - Checks for forbidden words and patterns
+   - Validates basic style rules
+   - Uses configurable forbidden words list
+   - Fast, deterministic evaluation
+
+2. **rubric**
+   - Applies predefined quality rubrics
+   - Checks documentation structure
+   - Validates formatting rules
+   - Quick structural analysis
+
+### AI-Powered Evaluators
+
+1. **clarity**
+   - Assesses text clarity (1-5 scale)
+   - Checks actionability
+   - Provides clarity improvement suggestions
+   - Uses AI for semantic understanding
+
+2. **empathy**
+   - Evaluates emotional intelligence
+   - Checks user-friendliness
+   - Suggests empathy improvements
+   - Considers reader perspective
+
+3. **tone**
+   - Analyzes writing tone
+   - Checks brand voice alignment
+   - Scores tone appropriateness (1-5)
+   - Suggests tone improvements
+
+### Usage Examples
+
+1. Fast evaluation (no AI calls):
+```bash
+python -m doc_agent generate \
+  --scenario "Document the API endpoint" \
+  --eval "heuristics,rubric" \
+  --fast
+```
+
+2. Comprehensive evaluation:
+```bash
+python -m doc_agent generate \
+  --scenario "Write error message" \
+  --eval "heuristics,rubric,clarity,empathy,tone" \
+  --show-details
+```
+
+3. Focus on user experience:
+```bash
+python -m doc_agent generate \
+  --scenario "Write installation guide" \
+  --eval "clarity,empathy" \
+  --style "User-friendly"
+```
+
+4. Quick development iteration:
+```bash
+python -m doc_agent generate \
+  --scenario "Draft API docs" \
+  --eval "heuristics" \
+  --fast
+```
+
+## Examples
+
+### Basic Documentation Generation
+
+1. Generate a function documentation:
+```bash
+python -m doc_agent generate \
+  --scenario "Write a function that sorts a list" \
+  --style "Clear and concise"
+```
+
+2. Generate API documentation with specific evaluators:
+```bash
+python -m doc_agent generate \
+  --scenario "Document the REST API endpoint" \
+  --eval heuristics,rubric,clarity \
+  --style "Technical and detailed"
+```
+
+3. Quick draft without evaluation (for development):
+```bash
+python -m doc_agent generate \
+  --scenario "Explain the caching mechanism" \
+  --no-eval
+```
+
+4. Generate with custom style and detailed output:
+```bash
+python -m doc_agent generate \
+  --scenario "Document the authentication flow" \
+  --style "Security-focused and thorough" \
+  --show-details \
+  --verbose
+```
+
+### Document Processing
+
+1. Process a Python source file:
+```bash
+python -m doc_agent process src/myproject/utils.py
+```
+
+2. Process with JSON output:
+```bash
+python -m doc_agent process \
+  --json \
+  path/to/document.py > output.json
+```
+
+3. Verbose processing with details:
+```bash
+python -m doc_agent process \
+  -v \
+  --show-details \
+  src/myproject/core.py
+```
+
+### Advanced Usage
+
+1. Custom evaluation pipeline:
+```bash
+python -m doc_agent generate \
+  --scenario "Document the database schema" \
+  --eval "heuristics,clarity,completeness" \
+  --max-iters 10 \
+  --show-details
+```
+
+2. Fast development iteration:
+```bash
+python -m doc_agent generate \
+  --scenario "Quick API endpoint draft" \
+  --fast \
+  --style "Brief"
+```
+
+3. Custom forbidden words:
+```bash
+python -m doc_agent generate \
+  --scenario "Write installation guide" \
+  --forbidden-file path/to/custom_forbidden.txt \
+  --style "User-friendly"
+```
+
+4. JSON output for integration:
+```bash
+python -m doc_agent generate \
+  --scenario "Document the config options" \
+  --json \
+  --eval "heuristics,completeness" > doc_output.json
+```
+
+## Project Structure
+
+```
+doc-agent/
+├── src/doc_agent/          # Core package
+│   ├── __main__.py        # Entry point
+│   ├── agent.py           # Agent implementation
+│   ├── pipeline.py        # Pipeline orchestration
+│   ├── agent_loop.py      # Processing loop
+│   ├── draft.py           # Content generation
+│   ├── tools.py           # Utility functions
+│   ├── lint.py           # Linting functionality
+│   ├── outline.py        # Document structure
+│   ├── publish.py        # Output generation
+│   ├── ingestion.py      # Input processing
+│   ├── evaluators/       # Quality assessment
+│   └── linters/         # Style checking
+├── docs/                 # Documentation
+│   ├── architecture.md   # System design
+│   └── adr/             # Architecture decisions
+├── tests/               # Test suite
+└── examples/            # Usage examples
+```
+
+## Architecture
+
+The system follows a pipeline architecture with these key components:
+
+1. **Input Processing** (`ingestion.py`): Parse requirements and style preferences
+2. **Content Generation** (`draft.py`): Generate initial documentation using LLMs
+3. **Quality Assessment** (`evaluators/`): Evaluate content using multiple metrics
+4. **Pipeline Processing** (`pipeline.py`): Coordinate the documentation flow
+5. **Agent Management** (`agent.py`): Handle AI interactions and improvements
+6. **Publication** (`publish.py`): Format and output final documentation
+
+For detailed architecture information, see [docs/architecture.md](docs/architecture.md).
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- OpenAI for their powerful language models
+- The Python community for excellent documentation tools
+- All contributors to this project

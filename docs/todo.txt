@@ -1,0 +1,9 @@
+Add Jinja templates under src/templates/ so you can customize the Markdown layout.
+
+Integrate with Git hooks (pre-commit) to automatically run pytest and your linter before each commit.
+
+Expose CLI flags (via argparse or click) in src/main.py for things like output directory or model choice.
+
+Extend tests to cover a few more edge cases—e.g., functions with no parameters, or multi-line examples.
+
+Set up CI/CD (GitHub Actions) to run your full pipeline on every PR.

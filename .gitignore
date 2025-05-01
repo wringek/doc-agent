@@ -1,7 +1,16 @@
 .venv/
 __pycache__/
 *.pyc
-docs/
 .env
 backups/
 notes/
+
+# Generated output files
+output/
+
+# Keep docs directory but ignore generated files
+docs/**/*.html
+docs/**/_build/
+
+.coverage
+.DS_Store
